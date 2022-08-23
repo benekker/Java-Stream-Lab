@@ -1,5 +1,6 @@
 package com.dcc.jpa_stream_lab.controllers;
 
+import java.text.ParseException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,13 +49,14 @@ public class StreamLabController {
     }
 
     @GetMapping("/RProblemFour")
-    public List<User> RProblemFour() {
+    public List<User> RProblemFour() throws ParseException {
     	return service.RProblemFour();
     }
     
     @GetMapping("/RProblemFive")
-    public List<User> RProblemFive() {
-    	return service.RProblemFive();
+    public List<User> RProblemFive() throws ParseException {
+
+        return service.RProblemFive();
     }
 
     // <><><><><><><><> R Actions (Read) with Foreign Keys <><><><><><><><><>

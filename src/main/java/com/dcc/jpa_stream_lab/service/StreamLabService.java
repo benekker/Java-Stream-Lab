@@ -1,5 +1,7 @@
 package com.dcc.jpa_stream_lab.service;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -69,22 +71,25 @@ public class StreamLabService {
     	return products.findAll().stream().filter(p -> p.getName().contains("s")).toList();
     }
 
-    public List<User> RProblemFour()
+    public List<User> RProblemFour() throws ParseException
     {
         // Write a query that gets all the users who registered BEFORE 2016
         // Return the list
         // Research 'java create specific date' and 'java compare dates'
         // You may need to use the helper classes imported above!
-    	
-        return null;
+      SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+      Date d1 = sdf.parse("2016-01-01");
+      return users.findAll().stream().filter(d -> d.getRegistrationDate().compareTo(d1) < 0).toList();
     }
 
-    public List<User> RProblemFive()
+    public List<User> RProblemFive() throws ParseException
     {
         // Write a query that gets all of the users who registered AFTER 2016 and BEFORE 2018
         // Return the list
-
-        return null;
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        Date d1 = sdf.parse("2016-01-01");
+        Date d2 = sdf.parse("2018-01-01");
+        return users.findAll().stream().filter(d -> d.getRegistrationDate().compareTo(d1) > 0 && d.getRegistrationDate().compareTo(d2) < 0).toList();
     }
 
     // <><><><><><><><> R Actions (Read) with Foreign Keys <><><><><><><><><>
@@ -102,17 +107,22 @@ public class StreamLabService {
     {
         // Write a query that retrieves all of the products in the shopping cart of the user who has the email "afton@gmail.com".
         // Return the list
+       List<ShoppingcartItem> usersItems = shoppingcartitems.findAll().stream().filter(i -> i.getUser().getEmail().contains("afton@gmail.com")).toList();
+       return usersItems.stream().map((p) -> p.getProduct()).toList();
 
-    	return null;
+
+
     }
 
     public long RProblemSeven()
     {
         // Write a query that retrieves all of the products in the shopping cart of the user who has the email "oda@gmail.com" and returns the sum of all of the products prices.
     	// Remember to break the problem down and take it one step at a time!
+        List<ShoppingcartItem> odasItems = shoppingcartitems.findAll().stream().filter(i -> i.getUser().getEmail().contains("oda@gmail.com")).toList();
+        return odasItems.stream().mapToInt((p) -> p.getProduct().getPrice()).sum();
 
 
-    	return 0;
+
 
     }
 
@@ -120,8 +130,10 @@ public class StreamLabService {
     {
         // Write a query that retrieves all of the products in the shopping cart of users who have the role of "Employee".
     	// Return the list
+        Role customerRole = roles.findAll().stream().filter(r -> r.getName().equals("Employee")).findFirst().orElse(null);
+        List<ShoppingcartItem> employeesItems = shoppingcartitems.findAll().stream().filter(i -> i.getUser().getRoles().contains(customerRole)).toList();
+        return employeesItems.stream().map((p)->p.getProduct()).toList();
 
-    	return null;
     }
 
     // <><><><><><><><> CUD (Create, Update, Delete) Actions <><><><><><><><><>
@@ -142,9 +154,14 @@ public class StreamLabService {
     {
         // Create a new Product object and add that product to the Products table.
         // Return the product
+        Product newProduct = new Product();
+        newProduct.setDescription("A great gaming mouse");
+        newProduct.setName("Razer gaming Mouse");
+        newProduct.setPrice(35);
+        products.save(newProduct);
+        return newProduct;
     	
 
-    	return null;
 
     }
 
@@ -162,8 +179,15 @@ public class StreamLabService {
     	// Create a new ShoppingCartItem to represent the new product you created being added to the new User you created's shopping cart.
         // Add the product you created to the user we created in the ShoppingCart junction table.
         // Return the ShoppingcartItem
+        ShoppingcartItem newShoppingcartItem = new ShoppingcartItem();
+        Product newProduct = products.findAll().stream().filter(p -> p.getName().contains("Razer")).findFirst().orElse(null);
+        newShoppingcartItem.setProduct(newProduct);
+        User david = users.findAll().stream().filter(u -> u.getEmail().equals("david@gmail.com")).findFirst().orElse(null);
+        newShoppingcartItem.setUser(david);
+        shoppingcartitems.save(newShoppingcartItem);
+        return newShoppingcartItem;
 
-    	return null;
+
     	
     }
 
@@ -181,15 +205,21 @@ public class StreamLabService {
     {
         // Update the price of the product you created to a different value.
         // Return the updated product
-    	return null;
+        Product newProduct = products.findAll().stream().filter(p -> p.getName().contains("Razer")).findFirst().orElse(null);
+        newProduct.setPrice(25);
+        return newProduct;
     }
 
     public User UProblemTwo()
     {
         // Change the role of the user we created to "Employee"
         // HINT: You need to delete the existing role relationship and then create a new UserRole object and add it to the UserRoles table
-
-    	return null;
+        User david = users.findAll().stream().filter(u -> u.getEmail().contains("mike@gmail.com")).findFirst().orElse(null);
+        Role previousRole = roles.findAll().stream().filter(r -> r.getName().equals("Customer")).findFirst().orElse(null);
+        david.removeRole(previousRole);
+        Role newRole = roles.findAll().stream().filter(r -> r.getName().equals("Employee")).findFirst().orElse(null);
+        david.addRole(newRole);
+        return david;
     }
 
     //BONUS:
