@@ -229,9 +229,24 @@ public class StreamLabService {
     
 	// DProblemOne
     // Delete the role relationship from the user who has the email "oda@gmail.com".
+    public User DProblemOne()
+    {
+        User newUser = users.findAll().stream().filter(u -> u.getEmail().contains("oda@gmail.com")).findFirst().orElse(null);
+        Role previousRole = roles.findAll().stream().filter(r -> r.getName().equals("Customer")).findFirst().orElse(null);
+        newUser.removeRole(previousRole);
+        return newUser;
+
+
+
+
+    }
 
     // DProblemTwo
     // Delete all the product relationships to the user with the email "oda@gmail.com" in the ShoppingCart table.
+    public User DProblemTwo()
+    {
+        return null;
+    }
 
     // DProblemThree
     // Delete the user with the email "oda@gmail.com" from the Users table using LINQ.
